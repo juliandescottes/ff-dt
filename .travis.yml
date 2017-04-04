@@ -1,0 +1,7 @@
+before_script:
+  - git config --global user.name "automation"
+  - git config --global user.email "automation@mozilla.org"
+
+script:
+  - ./make-devtools-repo.sh
+  - ./update-l10n-branch.sh
