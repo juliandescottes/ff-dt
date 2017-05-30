@@ -131,11 +131,12 @@ windows:
     name: devtools-windows-opt
     description: "Run tests of DevTools on windows"
 
-after-checks:
+sign:
   dependencies:
-    - windows
     - linux-opt
     - linux-debug
+  only-branches:
+    - master
   payload:
     maxRunTime: 600
     image: rail/python-test-runner
@@ -143,7 +144,13 @@ after-checks:
       - "/bin/bash"
       - "-cx"
       - >
-        ls
+        git clone $GITHUB_HEAD_REPO_URL -q --depth 1 --branch $GITHUB_HEAD_REPO_BRANCH devtools &&
+        cd devtools &&
+        git checkout -q $GITHUB_HEAD_REPO_SHA &&
+        apt-get install -qy jq openssl p7zip-full bc unzip curl &&
+        ./bin/release.sh &&
+        mkdir -p /home/worker/artifacts/public/ &&
+        mv devtools-signed.xpi /home/worker/artifacts/public/
   metadata:
-    name: devtools-after-tests
-    description: "Update artifacts if tests succeeded"
+    name: sign
+    description: "Sign the add-on if test succeeded"
